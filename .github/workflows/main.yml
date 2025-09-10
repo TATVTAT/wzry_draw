@@ -60,6 +60,7 @@ jobs:
 
       # 8️⃣ **第一次运行无条件保存缓存**（保证落盘）
       - name: Save Android NDK cache
+        if: steps.restore-ndk.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           path: ${{ env.NDK_DIR }}
