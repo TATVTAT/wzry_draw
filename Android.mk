@@ -22,8 +22,8 @@ LOCAL_CPPFLAGS := -w -std=c++17
 LOCAL_C_INCLUDES := \
     $(LOCAL_PATH)/include \
     $(LOCAL_PATH)/include/ImGui \
-    $(LOCAL_PATH)/include/draw \
-    $(LOCAL_PATH)/include/kma
+    $(LOCAL_PATH)/include/Draw \
+    $(LOCAL_PATH)/include/KMA
 
 # 自动收集 src 下所有源文件
 FILE_LIST := $(wildcard $(LOCAL_PATH)/src/**/*.c*) \
