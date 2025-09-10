@@ -1,5 +1,5 @@
 #include <iostream>
-#include "include/KernelInterface/kernel.h"
+#include "kernel.h"
 using namespace std;
 
 int main()
