@@ -15,16 +15,16 @@ jobs:
         uses: actions/checkout@v4
 
       # 2️⃣ 缓存 NDK r27d
-      - name: Cache Android NDK
-        id: cache-ndk
-        uses: actions/cache@v3
+      - name: Restore Android NDK cache
+        id: restore-ndk 
+        uses: actions/cache/restore@v4  
         with:
           path: $HOME/android-ndk-r27d
           key: ndk-r27d-linux   # NDK 缓存 Key
 
-      # 3️⃣ 下载并解压（仅在缓存 miss 时执行）
+      # 3️⃣ 仅当未命中缓存时下载并解压 NDK
       - name: Download Android NDK r27d
-        if: steps.cache-ndk.outputs.cache-hit != 'true'
+        if: steps.restore-ndk.outputs.cache-hit != 'true'
         run: |
           wget https://dl.google.com/android/repository/android-ndk-r27d-linux.zip
           unzip -q android-ndk-r27d-linux.zip -d $HOME
@@ -41,6 +41,14 @@ jobs:
             APP_BUILD_SCRIPT=Android.mk \
             NDK_APPLICATION_MK=Application.mk \
             -j$(nproc)
+
+      # 6️⃣ 保存缓存
+      - name: Save Android NDK cache
+        if: steps.restore-ndk.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: $HOME/android-ndk-r27d
+          key: ndk-r27d-linux
 
       # 6️⃣ 上传构建产物
       - name: Upload Build Artifacts
