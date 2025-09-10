@@ -2,8 +2,8 @@ name: Android NDK Build
 
 on:
   push:
-    branches: [ main ]   # 代码推送到 main 分支自动构建
-  workflow_dispatch:     # 允许手动触发
+    branches: [ main ]   # 推送到 main 自动构建
+  workflow_dispatch:     # 支持手动触发
 
 jobs:
   build:
@@ -20,16 +20,16 @@ jobs:
         uses: actions/cache@v3
         with:
           path: $HOME/android-ndk-r27d
-          key: ndk-r27d-linux   # 缓存 Key
+          key: ndk-r27d-linux   # NDK 缓存 Key
 
-      # 3️⃣ 如果缓存没有命中，下载并解压 NDK
+      # 3️⃣ 下载并解压（仅在缓存 miss 时执行）
       - name: Download Android NDK r27d
         if: steps.cache-ndk.outputs.cache-hit != 'true'
         run: |
           wget https://dl.google.com/android/repository/android-ndk-r27d-linux.zip
           unzip -q android-ndk-r27d-linux.zip -d $HOME
 
-      # 4️⃣ 把 NDK 加到 PATH
+      # 4️⃣ 将 NDK 添加到 PATH
       - name: Add NDK to PATH
         run: echo "$HOME/android-ndk-r27d" >> $GITHUB_PATH
 
@@ -42,9 +42,9 @@ jobs:
             NDK_APPLICATION_MK=Application.mk \
             -j$(nproc)
 
-      # 6️⃣ 上传编译产物
+      # 6️⃣ 上传构建产物
       - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ndk-output
           path: |
