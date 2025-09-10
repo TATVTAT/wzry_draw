@@ -1,5 +1,5 @@
 #include "include/KernelInterface/kernel.h"
-#include "include/kma/driver.h"
+#include "include/KMA/driver.h"
 #include <cstdio>
 #include <stdlib.h>
 
