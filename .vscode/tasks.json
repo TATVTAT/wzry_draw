@@ -1,0 +1,26 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "NDK Build",
+            "type": "shell",
+            "command": "D:/AndroidTool/android-ndk/android-ndk-r27d/ndk-build.cmd",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "args": [
+                "NDK_PROJECT_PATH=.",
+                "APP_BUILD_SCRIPT=Android.mk",
+                "NDK_APPLICATION_MK=Application.mk",
+                "-j8"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        }
+    ]
+}
