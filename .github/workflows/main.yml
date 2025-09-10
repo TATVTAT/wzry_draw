@@ -12,52 +12,54 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2️⃣ 恢复缓存
+      # 2️⃣ 固定 NDK 绝对路径（防止 $HOME 变化引发缓存失败） ← 新增
+      - name: Set NDK path
+        run: echo "NDK_PATH=/home/runner/android-ndk-r27d" >> $GITHUB_ENV
+
+      # 3️⃣ 恢复缓存（v4 restore）
       - name: Restore Android NDK cache
         id: restore-ndk
         uses: actions/cache/restore@v4
         with:
-          path: $HOME/android-ndk-r27d
+          path: /home/runner/android-ndk-r27d      # ← 不用 $HOME
           key: ndk-r27d-linux
 
-      # 3️⃣ 未命中缓存时下载并解压
+      # 4️⃣ 未命中缓存时下载并解压
       - name: Download Android NDK r27d
         if: steps.restore-ndk.outputs.cache-hit != 'true'
         run: |
           wget https://dl.google.com/android/repository/android-ndk-r27d-linux.zip
-          unzip -q android-ndk-r27d-linux.zip -d $HOME
+          unzip -q android-ndk-r27d-linux.zip -d /home/runner
 
-      # 4️⃣ 调试：列出 NDK 解压目录 ← 新增
+      # 5️⃣ 调试：列出路径内容（可选）
       - name: Debug NDK path
         run: |
-          echo "HOME is: $HOME"
-          echo "--- List HOME ---"
-          ls -la $HOME
-          echo "--- List NDK dir ---"
-          ls -la $HOME/android-ndk-r27d || echo "NDK dir missing!"
+          echo "NDK path is: $NDK_PATH"
+          ls -la /home/runner
+          ls -la "$NDK_PATH" || echo "NDK dir missing!"
 
-      # 5️⃣ 将 NDK 添加到 PATH
+      # 6️⃣ 将 NDK 添加到 PATH
       - name: Add NDK to PATH
-        run: echo "$HOME/android-ndk-r27d" >> $GITHUB_PATH
+        run: echo "$NDK_PATH" >> $GITHUB_PATH
 
-      # 6️⃣ 编译
+      # 7️⃣ 编译
       - name: Build with ndk-build
         run: |
-          $HOME/android-ndk-r27d/ndk-build \
+          "$NDK_PATH"/ndk-build \
             NDK_PROJECT_PATH=. \
             APP_BUILD_SCRIPT=Android.mk \
             NDK_APPLICATION_MK=Application.mk \
             -j$(nproc)
 
-      # 7️⃣ 保存缓存（目录存在且非空时） ← 修改
+      # 8️⃣ 保存缓存（仅未命中且目录非空时）
       - name: Save Android NDK cache
-        if: steps.restore-ndk.outputs.cache-hit != 'true' && hashFiles('${{ env.HOME }}/android-ndk-r27d/**') != ''
+        if: steps.restore-ndk.outputs.cache-hit != 'true' && hashFiles('/home/runner/android-ndk-r27d/**') != ''
         uses: actions/cache/save@v4
         with:
-          path: $HOME/android-ndk-r27d
+          path: /home/runner/android-ndk-r27d   # ← 同样用绝对路径
           key: ndk-r27d-linux
 
-      # 8️⃣ 上传构建产物
+      # 9️⃣ 上传构建产物
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
