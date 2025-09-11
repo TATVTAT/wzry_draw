@@ -4,6 +4,5 @@ using namespace std;
 
 int main()
 {
-    new KernelDriver();
     return 0;
 }
