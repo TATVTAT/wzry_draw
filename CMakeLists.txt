@@ -28,22 +28,23 @@ include_directories(
         ${CMAKE_SOURCE_DIR}/include/NativeSurface
 )
 
-# 自动收集 src 下的所有源文件
+# 自动收集 src 下所有 cpp 文件
 file(GLOB_RECURSE SRC_FILES
-        ${CMAKE_SOURCE_DIR}/src/*.c*
+        ${CMAKE_SOURCE_DIR}/src/*.cpp
 )
 
-# 添加可执行文件（输出 AuroraTest，不带 .sh）
+# 添加可执行文件
 add_executable(AuroraTest ${SRC_FILES})
 
-# 链接静态库 driver.a
+# 链接 driver.a 静态库
 add_library(driver STATIC IMPORTED)
-set_target_properties(driver PROPERTIES IMPORTED_LOCATION
-        ${CMAKE_SOURCE_DIR}/prebuilt/kma/driver.a
+set_target_properties(driver PROPERTIES
+        IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/prebuilt/kma/driver.a
+        INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/include/KMA
 )
 
-# 链接系统库 (OpenGL ES + Android + log)
-target_link_libraries(AuroraTest
+# 链接库
+target_link_libraries(AuroraTest PRIVATE
         driver
         EGL
         GLESv2
